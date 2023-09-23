@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8' />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      axios.get("https://localhost:7191/api/Events"
+      ).then((res) => {
+        var calendarEl = document.getElementById("calendar");
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: "dayGridMonth", events: res.data,
+        });
+
+        calendar.render();
+      });
+
+    });
+    function show() {
+      document.getElementById("add").style.display = "inline";
+      document.getElementById("addb").style.display = "none";
+    }
+    function show2() {
+
+      axios.get("https://localhost:7191/api/Events").then((res) => {
+        array = res.data
+        array.forEach(element => {
+          var op = document.createElement("option");
+          op.text = element.title + " " + element.start;
+          document.getElementById("s").appendChild(op);
+        });
+      });
+      document.getElementById("update").style.display = "inline";
+
+    }
+    function show3(){
+      axios.get("https://localhost:7191/api/Events").then((res) => {
+        array = res.data
+        array.forEach(element => {
+          var op = document.createElement("option");
+          op.text = element.title + " " + element.start;
+          document.getElementById("s2").appendChild(op);
+        });
+      });
+      document.getElementById("delete").style.display = "inline";
+    }
+    function deletep(){
+      axios.get("https://localhost:7191/api/Events").then((res) => {
+        id=res.data[document.getElementById('s2').selectedIndex].id;
+
+      });
+    }
+    function del(){
+      axios.delete(`https://localhost:7191/api/Events/${id}`).then((res) => {
+            
+      });
+      
+    }
+    let id;
+    function up() {
+      axios.get("https://localhost:7191/api/Events").then((res) => {
+        document.getElementById("text").value = res.data[document.getElementById('s').selectedIndex].title;
+        document.getElementById("date").value = res.data[document.getElementById('s').selectedIndex].start;
+        id=res.data[document.getElementById('s').selectedIndex].id
+
+      });
+
+    }
+    function upd() {
+      var t = document.getElementById("text").value;
+      var s = document.getElementById("date").value;
+      axios.put(`https://localhost:7191/api/Events/${id}`, {
+        "title":t ,
+        "start": s
+      }).then(res => {
+        console.log(res.data)
+      })
+      
+    }
+
+
+    function addp() {
+      var ti = document.getElementById("t").value;
+      var st = document.getElementById("d").value;
+
+      axios.post("https://localhost:7191/api/Events"
+         , {
+        "title": ti,
+        "start": st
+      }).then(res => {
+        console.log(res.data)
+
+      })
+       
+
+    }
+  </script>
+</head>
+
+<body>
+  <button id="addb" onclick="show()">add</button>
+  <div id="add" style="display: none;">
+    <input id="t" type="text">
+    <input id="d" type="date">
+    <button onclick="addp()">ok</button>
+  </div>
+  <button onclick="show2()">update</button>
+  <div id="update" style="display: none;">
+    <select id="s" onchange="up()">
+        
+    </select>
+    <input id="text" type="text">
+    <input id="date"  type="datetime">
+    <button onclick="upd()">ok</button>
+  </div>
+  <button onclick="show3()">delete</button>
+  <div id="delete" style="display: none;">
+       <select id="s2" onchange="deletep()" >
+          
+       </select>
+       <button onclick="del()">ok</button>
+  </div>
+  <div id='calendar'></div>
+</body>
+
+</html>
